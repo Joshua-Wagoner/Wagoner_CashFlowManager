@@ -8,7 +8,7 @@ namespace Wagoner_CashFlowManager
 {
     class Invoice : IPayable
     {
-        private Random rand = new Random();
+        private static Random rand = new Random();
 
         private string partNumber;
         private string partDescription;
