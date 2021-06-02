@@ -8,6 +8,8 @@ namespace Wagoner_CashFlowManager
 {
     class Invoice : IPayable
     {
+        private Random rand = new Random();
+
         private string partNumber;
         private string partDescription;
         private int quanity;
@@ -30,11 +32,11 @@ namespace Wagoner_CashFlowManager
 
         public override string ToString()
         {
-            return string.Format("Invoice: " + new Random().Next(99999, 1000000) + "_" + partNumber
+            return string.Format("Invoice: " + rand.Next(99999, 1000000) + "_" + partNumber
                 + "\nQuanity: " + quanity
                 + "\nPart Description: " + partDescription
                 + "\nUnit Price: ${0:.00}"
-                + "\nExtended Price: ${1:.00}", price, ExtendedPrice());
+                + "\nExtended Price: ${1:.00}\n", price, ExtendedPrice());
         }
 
         private decimal ExtendedPrice()

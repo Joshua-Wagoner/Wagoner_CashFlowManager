@@ -30,7 +30,7 @@ namespace Wagoner_CashFlowManager
               + "\nSSN: " + SSN
               + "\nHourly Wage: ${0:.00}" 
               + "\nHours worked: " + hoursWorked 
-              + "\nEarned: ${1:.00}",
+              + "\nEarned: ${1:.00}\n",
                 hourlyWage, Earnings());
         }
     }

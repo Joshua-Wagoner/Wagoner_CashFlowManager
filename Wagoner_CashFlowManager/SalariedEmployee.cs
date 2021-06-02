@@ -26,7 +26,7 @@ namespace Wagoner_CashFlowManager
             return string.Format(Type + " Employee: " + FirstName + " " + LastName
                 + "\nSSN: " + SSN
                 + "\nWeekly Salary: ${0:.00}" 
-                +"\nEarned: ${1:.00}", 
+                +"\nEarned: ${1:.00}\n", 
                 salary, Earnings());
         }
     }
