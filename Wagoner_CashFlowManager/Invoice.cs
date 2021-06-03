@@ -25,7 +25,7 @@ namespace Wagoner_CashFlowManager
 
         public decimal GetPayableAmount()
         {
-            return price;
+            return ExtendedPrice();
         }
 
         public override string ToString()
