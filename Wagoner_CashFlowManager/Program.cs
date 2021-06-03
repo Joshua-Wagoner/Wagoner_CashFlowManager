@@ -1,27 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
-
+/*
+ * Joshua Wagoner
+ * IT112
+ * NOTES: This was definitely a challenging assignment; required me to think outside
+ * of the box, and come up with ways that made it so no classes used
+ * outside resources without explicitly using them. I used a manager class for all the 
+ * ledger operations, so nothing would be done in the main class that had to do with calculations
+ * and returning the ledger report; thus, it is also the class that manages all the items/ledgers.
+ * I hope I did it right, and I gave it my very best shot. I guess I'll learn something new if I
+ * did something wrong.
+ * BEHAVIOURS NOT IMPLEMENTED AND WHY: I believe all parts of this assignment are completed in full!
+ * 
+ */
 namespace Wagoner_CashFlowManager
 {
     class Program
     {
-        private static List<IPayable> payables = new List<IPayable>();
-
         static void Main(string[] args)
         {
             ConsoleKeyInfo keyInfo;
-            
-            payables.Add(new HourlyEmployee("Larry", "Willy", "111-11-1111", 10.02M, 40));
-            payables.Add(new HourlyEmployee("Shelly", "Butter", "222-22-2222", .30M, 48));
-            payables.Add(new HourlyEmployee("Bob", "Dick", "333-33-3333", 1.45M, 43));
 
-            payables.Add(new SalariedEmployee("Robbie", "Nell", "444-44-4444", 1234.56M));
-            payables.Add(new SalariedEmployee("Bell", "Ring", "555-55-5555", 5432.10M));
-            payables.Add(new SalariedEmployee("Ding", "Dong", "666-66-6666", 6565.54M));
+            LedgerManager manager = new LedgerManager(new List<IPayable>());
 
-            payables.Add(new Invoice("2534", "Jingle Bells", 2, 1.00M));
-            payables.Add(new Invoice("3521", "Sugar Cakes", 5, 2.00M));
-            payables.Add(new Invoice("3321", "Lemon Pies", 1, 20.00M));
+            Random rand = new Random();
+
+            manager.AddLedger(new HourlyEmployee("Larry", "Willy", "111-11-1111", 10.02M, 40));
+            manager.AddLedger(new HourlyEmployee("Shelly", "Butter", "222-22-2222", .30M, 48));
+            manager.AddLedger(new HourlyEmployee("Bob", "Dick", "333-33-3333", 1.45M, 43));
+
+            manager.AddLedger(new SalariedEmployee("Robbie", "Nell", "444-44-4444", 1234.56M));
+            manager.AddLedger(new SalariedEmployee("Bell", "Ring", "555-55-5555", 5432.10M));
+            manager.AddLedger(new SalariedEmployee("Ding", "Dong", "666-66-6666", 6565.54M));
+
+            manager.AddLedger(new Invoice(rand.Next(99999, 1000000) + "_" + "2534", "Jingle Bells", 2, 1.00M));
+            manager.AddLedger(new Invoice(rand.Next(99999, 1000000) + "_" + "3521", "Sugar Cakes", 5, 2.00M));
+            manager.AddLedger(new Invoice(rand.Next(99999, 1000000) + "_" + "3321", "Lemon Pies", 1, 20.00M));
 
             bool optOut = false;
 
@@ -30,17 +44,17 @@ namespace Wagoner_CashFlowManager
                 Console.Clear();
                 Console.WriteLine(
                     "1. Get Payroll Report"
-                    +"\n2. Add a new Invoice"
-                    +"\n3. Add a new Hourly Employee"
-                    +"\n4. Add a new Salaried Employee"
-                    +"\n5. Exit");
+                    + "\n2. Add a new Invoice"
+                    + "\n3. Add a new Hourly Employee"
+                    + "\n4. Add a new Salaried Employee"
+                    + "\n5. Exit");
 
                 keyInfo = Console.ReadKey(true);
 
                 if (keyInfo.Key == ConsoleKey.D1 || keyInfo.Key == ConsoleKey.NumPad1)
                 {
                     Console.Clear();
-                    Console.WriteLine(GetPayrollReport());
+                    Console.WriteLine(manager.GetLedgersReport());
                     Console.WriteLine("Press any key to continue");
                     Console.ReadKey(true);
                 }
@@ -59,7 +73,7 @@ namespace Wagoner_CashFlowManager
                     Console.WriteLine("Enter the Price: ");
                     p = decimal.Parse(Console.ReadLine());
 
-                    payables.Add(new Invoice(a, b, q, p));
+                    manager.AddLedger(new Invoice(rand.Next(99999, 1000000) + "_" + a, b, q, p));
                 }
                 else if (keyInfo.Key == ConsoleKey.D3 || keyInfo.Key == ConsoleKey.NumPad3)
                 {
@@ -78,7 +92,7 @@ namespace Wagoner_CashFlowManager
                     Console.WriteLine("Enter the Hours Worked: ");
                     h = int.Parse(Console.ReadLine());
 
-                    payables.Add(new HourlyEmployee(a, b, c, w, h));
+                    manager.AddLedger(new HourlyEmployee(a, b, c, w, h));
                 }
                 else if (keyInfo.Key == ConsoleKey.D4 || keyInfo.Key == ConsoleKey.NumPad4)
                 {
@@ -94,61 +108,13 @@ namespace Wagoner_CashFlowManager
                     Console.WriteLine("Enter the Weekly Salary: ");
                     s = decimal.Parse(Console.ReadLine());
 
-                    payables.Add(new SalariedEmployee(a, b, c, s));
+                    manager.AddLedger(new SalariedEmployee(a, b, c, s));
                 }
                 else if (keyInfo.Key == ConsoleKey.D5 || keyInfo.Key == ConsoleKey.NumPad5)
                 {
                     optOut = true;
                 }
             }
-        }
-
-        private static string GetPayrollReport()
-        {
-            return GetTotalLedgerReport();
-        }
-
-        private static string GetTotalLedgerReport()
-        {
-            return string.Format("Weekly Cash Flow Analysis as follows:"
-                + "\n\n"+ ListItems()
-                + "\nTotal Weekly Payout: ${0:.00}"
-                + "\nCategory Breakdown:"
-                + "\n  Invoices: ${1:.00}"
-                + "\n  Salaried Payroll: ${2:.00}"
-                + "\n  Hourly Payroll: ${3:.00}\n", 
-                GetTotalPayout(), 
-                GetTotalTypePayout(LedgerType.Invoice),
-                GetTotalTypePayout(LedgerType.Salaried), 
-                GetTotalTypePayout(LedgerType.Hourly));
-        }
-
-        private static string ListItems()
-        {
-            string s = string.Empty;
-
-            foreach (IPayable payable in payables)
-                s += payable.ToString() + "\n";
-            return s;
-        }
-
-        private static decimal GetTotalPayout()
-        {
-            decimal d = 0;
-
-            foreach (IPayable payable in payables)
-                d += payable.GetPayableAmount();
-            return d;
-        }
-
-        private static decimal GetTotalTypePayout(LedgerType type)
-        {
-            decimal d = 0;
-
-            foreach (IPayable payable in payables)
-                if (payable.Type == type)
-                    d += payable.GetPayableAmount();
-            return d;
         }
     }
 }
