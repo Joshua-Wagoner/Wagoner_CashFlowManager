@@ -21,7 +21,7 @@ namespace Wagoner_CashFlowManager
         {
             ConsoleKeyInfo keyInfo;
 
-            LedgerManager manager = new LedgerManager(new List<IPayable>());
+            LedgerManager manager = LedgerManager.GetInstance();
 
             Random rand = new Random();
 

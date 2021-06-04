@@ -8,33 +8,38 @@ namespace Wagoner_CashFlowManager
 {
     class LedgerManager
     {
-        private List<IPayable> ledgers;
+        private IPayable[] ledgers = new IPayable[50];
 
-        public LedgerManager(List<IPayable> ledgers) { this.ledgers = ledgers; }
+        private static LedgerManager ledgerManager = new LedgerManager();
+        private int index;
+
+        private LedgerManager() {}
+
+        public static LedgerManager GetInstance()
+        {
+            return ledgerManager;
+        }
 
         public void AddLedger(IPayable ledger)
         {
-            ledgers.Add(ledger);
+            ledgers[index] = ledger;
+            index++;
+            Console.WriteLine(ledger.Type);
         }
 
         public string GetLedgersReport()
         {
-            return GetTotalLedgerReport();
-        }
-
-        private string GetTotalLedgerReport()
-        {
-            return string.Format("Weekly Cash Flow Analysis as follows:"
+            return string.Format("Weekly Cash Flow Analysis is as follows: "
                 + "\n\n" + ListItems()
-                + "\nTotal Weekly Payout: ${0:.00}"
-                + "\nCategory Breakdown:"
-                + "\n  Invoices: ${1:.00}"
-                + "\n  Salaried Payroll: ${2:.00}"
-                + "\n  Hourly Payroll: ${3:.00}\n",
-                GetTotalPayout(),
-                GetTotalTypePayout(LedgerType.Invoice),
-                GetTotalTypePayout(LedgerType.Salaried),
-                GetTotalTypePayout(LedgerType.Hourly));
+                + "\nTotal Weekly Payout ${0:.00}"
+                + "\nCategory Breakdown: "
+                + "\n  Invoices ${1:.00}"
+                + "\n  Salaried Payroll ${2:.00}"
+                + "\n  Hourly Payroll ${3:.00}\n", 
+                GetTotalPayout(), 
+                GetTypePayout(LedgerType.Invoice), 
+                GetTypePayout(LedgerType.Salaried), 
+                GetTypePayout(LedgerType.Hourly));
         }
 
         private string ListItems()
@@ -42,7 +47,8 @@ namespace Wagoner_CashFlowManager
             string s = string.Empty;
 
             foreach (IPayable ledger in ledgers)
-                s += ledger.ToString() + "\n";
+                if(ledger != null)
+                    s += ledger.ToString() + "\n";
             return s;
         }
 
@@ -51,19 +57,26 @@ namespace Wagoner_CashFlowManager
             decimal d = 0;
 
             foreach (IPayable ledger in ledgers)
-                d += ledger.GetPayableAmount();
-            return d;
-        }
-
-        private decimal GetTotalTypePayout(LedgerType type)
-        {
-            decimal d = 0;
-
-            foreach (IPayable ledger in ledgers)
-                if (ledger.Type == type)
+                if (ledger != null)
                     d += ledger.GetPayableAmount();
             return d;
         }
 
+        private decimal GetTypePayout(LedgerType Type)
+        {
+            decimal d = 0;
+
+            IPayable temp;
+
+            foreach (IPayable payable in ledgers)
+                if (payable != null)
+                {
+                    temp = payable;
+                    if (temp.Type == Type)
+                        d += temp.GetPayableAmount();
+                }
+
+            return d;
+        }
     }
 }
