@@ -24,7 +24,6 @@ namespace Wagoner_CashFlowManager
         {
             ledgers[index] = ledger;
             index++;
-            Console.WriteLine(ledger.Type);
         }
 
         public string GetLedgersReport()
